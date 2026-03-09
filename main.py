@@ -1,7 +1,6 @@
 """
 Punto de entrada del sistema de biblioteca digital.
 Aquí se implementa el menú interactivo para probar el sistema.
-No contiene lógica de negocio, solo llamadas al servicio.
 """
 
 from modelos.libro import Libro
@@ -26,13 +25,11 @@ def menu():
         print("8. Buscar libro por autor")
         print("9. Buscar libro por categoría")
         print("10. Listar libros prestados de un usuario")
+        print("11. Mostrar todos los libros del catálogo")
         print("0. Salir")
 
         opcion = input("\nSeleccione una opción: ")
 
-        # -------------------------
-        # Añadir libro
-        # -------------------------
         if opcion == "1":
 
             titulo = input("Título: ")
@@ -44,18 +41,12 @@ def menu():
 
             biblioteca.agregar_libro(libro)
 
-        # -------------------------
-        # Quitar libro
-        # -------------------------
         elif opcion == "2":
 
             isbn = input("ISBN del libro a eliminar: ")
 
             biblioteca.quitar_libro(isbn)
 
-        # -------------------------
-        # Registrar usuario
-        # -------------------------
         elif opcion == "3":
 
             nombre = input("Nombre del usuario: ")
@@ -65,18 +56,12 @@ def menu():
 
             biblioteca.registrar_usuario(usuario)
 
-        # -------------------------
-        # Dar de baja usuario
-        # -------------------------
         elif opcion == "4":
 
             id_usuario = input("ID del usuario a eliminar: ")
 
             biblioteca.eliminar_usuario(id_usuario)
 
-        # -------------------------
-        # Prestar libro
-        # -------------------------
         elif opcion == "5":
 
             id_usuario = input("ID del usuario: ")
@@ -84,37 +69,35 @@ def menu():
 
             biblioteca.prestar_libro(id_usuario, isbn)
 
-        # -------------------------
-        # Devolver libro
-        # -------------------------
         elif opcion == "6":
 
             id_usuario = input("ID del usuario: ")
 
-            usuario = biblioteca.usuarios.get(id_usuario)
+            if id_usuario in biblioteca.usuarios:
 
-            if usuario:
+                usuario = biblioteca.usuarios[id_usuario]
 
                 if not usuario.libros_prestados:
                     print("El usuario no tiene libros prestados.")
+
                 else:
 
                     print("\nLibros prestados:")
-                    for i, libro in enumerate(usuario.libros_prestados):
-                        print(f"{i+1}. {libro}")
 
-                    indice = int(input("Seleccione número del libro a devolver: ")) - 1
+                    for libro in usuario.libros_prestados:
+                        print(libro)
 
-                    libro = usuario.libros_prestados[indice]
+                    isbn = input("ISBN del libro a devolver: ")
 
-                    biblioteca.devolver_libro(id_usuario, libro)
+                    for libro in usuario.libros_prestados:
+
+                        if libro.isbn == isbn:
+
+                            biblioteca.devolver_libro(id_usuario, libro)
 
             else:
                 print("Usuario no encontrado.")
 
-        # -------------------------
-        # Buscar por título
-        # -------------------------
         elif opcion == "7":
 
             titulo = input("Título a buscar: ")
@@ -127,9 +110,6 @@ def menu():
             else:
                 print("No se encontraron libros.")
 
-        # -------------------------
-        # Buscar por autor
-        # -------------------------
         elif opcion == "8":
 
             autor = input("Autor a buscar: ")
@@ -142,9 +122,6 @@ def menu():
             else:
                 print("No se encontraron libros.")
 
-        # -------------------------
-        # Buscar por categoría
-        # -------------------------
         elif opcion == "9":
 
             categoria = input("Categoría a buscar: ")
@@ -157,31 +134,27 @@ def menu():
             else:
                 print("No se encontraron libros.")
 
-        # -------------------------
-        # Listar libros prestados
-        # -------------------------
         elif opcion == "10":
 
             id_usuario = input("ID del usuario: ")
 
-            usuario = biblioteca.usuarios.get(id_usuario)
+            if id_usuario in biblioteca.usuarios:
 
-            if usuario:
+                usuario = biblioteca.usuarios[id_usuario]
 
                 if not usuario.libros_prestados:
                     print("El usuario no tiene libros prestados.")
                 else:
-
-                    print("\nLibros prestados:")
                     for libro in usuario.libros_prestados:
                         print(libro)
 
             else:
                 print("Usuario no encontrado.")
 
-        # -------------------------
-        # Salir
-        # -------------------------
+        elif opcion == "11":
+
+            biblioteca.listar_libros()
+
         elif opcion == "0":
 
             print("Saliendo del sistema...")

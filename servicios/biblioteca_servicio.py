@@ -1,5 +1,6 @@
 """
 Servicio que contiene la lógica de negocio del sistema de biblioteca.
+Aquí se gestionan los libros, usuarios, préstamos, devoluciones y búsquedas.
 """
 
 from modelos.libro import Libro
@@ -9,16 +10,16 @@ from modelos.usuario import Usuario
 class BibliotecaServicio:
 
     def __init__(self):
-        
-        # Diccionario de libros
+
+        # Diccionario de libros disponibles
         # clave: ISBN
         # valor: objeto Libro
         self.libros = {}
 
-        # Diccionario de usuarios
+        # Diccionario de usuarios registrados
         self.usuarios = {}
 
-        # Conjunto para IDs únicos
+        # Conjunto para mantener IDs únicos
         self.ids_usuarios = set()
 
     # ---------------------------
@@ -82,19 +83,25 @@ class BibliotecaServicio:
 
         usuario.prestar_libro(libro)
 
+        # eliminar del catálogo disponible
         del self.libros[isbn]
 
         print("Libro prestado correctamente.")
 
     def devolver_libro(self, id_usuario, libro):
 
+        if id_usuario not in self.usuarios:
+            print("Usuario no encontrado.")
+            return
+
         usuario = self.usuarios[id_usuario]
 
         usuario.devolver_libro(libro)
 
+        # volver a agregar al catálogo
         self.libros[libro.isbn] = libro
 
-        print("Libro devuelto.")
+        print("Libro devuelto correctamente.")
 
     # ---------------------------
     # Búsquedas
@@ -102,12 +109,48 @@ class BibliotecaServicio:
 
     def buscar_por_titulo(self, titulo):
 
-        return [l for l in self.libros.values() if l.obtener_titulo().lower() == titulo.lower()]
+        resultados = []
+
+        for libro in self.libros.values():
+
+            if titulo.lower() in libro.obtener_titulo().lower():
+                resultados.append(libro)
+
+        return resultados
 
     def buscar_por_autor(self, autor):
 
-        return [l for l in self.libros.values() if l.obtener_autor().lower() == autor.lower()]
+        resultados = []
+
+        for libro in self.libros.values():
+
+            if autor.lower() in libro.obtener_autor().lower():
+                resultados.append(libro)
+
+        return resultados
 
     def buscar_por_categoria(self, categoria):
 
-        return [l for l in self.libros.values() if l.categoria.lower() == categoria.lower()]
+        resultados = []
+
+        for libro in self.libros.values():
+
+            if categoria.lower() in libro.categoria.lower():
+                resultados.append(libro)
+
+        return resultados
+
+    # ---------------------------
+    # Listar catálogo completo
+    # ---------------------------
+
+    def listar_libros(self):
+
+        if not self.libros:
+            print("No hay libros disponibles en el catálogo.")
+            return
+
+        print("\nLibros disponibles en la biblioteca:")
+
+        for libro in self.libros.values():
+            print(libro)
